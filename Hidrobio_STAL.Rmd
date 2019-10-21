@@ -1,0 +1,110 @@
+---
+output:
+  html_document:
+    theme: default
+    highlight: tango
+    toc: true
+    toc_float: true
+---
+
+```{r, echo=FALSE}
+library(knitr)
+options(figure_counter = FALSE)
+opts_knit$set(eval.after='fig.cap')
+knitr::opts_chunk$set(tidy=TRUE, echo=TRUE, warning=FALSE, message=FALSE, dev='svg', fig.width=5, fig.height=4)
+```
+<base target="_blank"/>
+
+# Análisis de datos de Hidrobiología STAL`Administrado` - `Comunidad`- `Habitat`
+
+El presente documento contempla los análisis de datos para determinar los parámetros comunitarios e indicadores bióticos de las comunidades hidrobiológicas de las unidades fiscalizables presentes en el río Rímac.
+
+## Objetivos
+El presente script está diseñado para cumplir con los siguientes objetivos:
+
+* Análisis de la riqueza y composición taxonómica.
+
+* Análisis de la abundancia y abundancia relativa.
+
+* Análisis de indicadores de diversidad (Diversidad alfa)
+
+* Análisis de similitud (Diversidad beta)
+
+--------
+
+## Paquetes
+Se emplean paquetes de R para la manipulación de datos ecológicos, métodos estadísticos, y motores gráficos.
+
+```{r}
+# En caso de que los paquetes no estén instalados 
+
+#install.packages(c("FSA", "dplyr", "picante", "spacodiR", "reshape2", "cowplot", "vegan", "ggplopt2"))
+```
+
+
+```{r cache=FALSE, results='hide', message=FALSE, echo= FALSE}
+library(FSA)
+library(dplyr)
+library(picante)
+library(spacodiR)
+library(reshape2)
+library(cowplot)
+library(vegan)
+library(ggplot2)
+```
+
+## Bases de datos empleadas
+La base de datos es el compilado de datos biológicos de comunidades hidrobiológicas colectados a lo largo de la cuenca del río Rímac.
+
+```{r echo=FALSE}
+##############################################################
+df <- read.csv("Data_base.csv", sep = ",")
+##############################################################
+```
+
+
+## Manipulación de la base de datos
+
+### 1. Parámetros de selección de datos
+
+Definimos los parámetros que servirán para extraer las matrices de la base de datos principal como: `Administrado`, `Unidad`, `Comunidad`, `Microcuenca`, `Tipo_Cuerpo_de_agua` y cualquier otro diferenciador que se necesite:
+
+```{r echo = FALSE}
+Adm <- "Empresa de Generación Huanza SA" # Administrado
+Uni <- "Huanza" # Unidad
+Com <- "Perifiton" # Comunidad biológica
+Mic <- "Santa Eulalia" # Microcuenca
+Hab <- "Lótico" # Habitat
+```
+
+### 2. Subconjuntos de datos
+
+Base de datos biológica: `df_bio`
+
+Base de datos física: `df_env`
+
+Base de datos de identidad: `df_id`
+
+```{r echo= FALSE}
+df <- df %>%
+  filter(
+    Administrado == Adm,
+    #Unidad == Uni,
+    #Microcuenca == Mic,
+    #Habitat == Hab,
+    Comunidad == Com
+    ) %>% 
+  droplevels()
+
+df_bio <- df %>% 
+  select(Estacion, Abundancia, Taxa) %>% 
+  rename(Site = Estacion, Abundance = Abundancia, Species = Taxa)
+df_bio <- sample2matrix(df_bio)
+
+# df_env - Por programar
+# df_id  - Por programar
+```
+
+
+---------------------------
+[Fernando Tapia - Especialista en Hidrobiología y Biodiversidad](https://github.com/Fertapia/Diversity_IGAS) . 15 de Octubre de 2019. Última actualización: `r Sys.Date()`
